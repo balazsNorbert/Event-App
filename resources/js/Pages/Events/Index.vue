@@ -1,15 +1,41 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Events</h1>
-    <ul>
-      <li v-for="event in events" :key="event.id" class="mb-2 border-b pb-2">
-        <strong>{{ event.title }}</strong> - {{ event.location }} ({{ event.start_time }})
-      </li>
-    </ul>
-  </div>
+  <component :is="layout">
+    <div class="p-6">
+      <h1 class="text-xl sm:text-2xl xl:text-3xl font-bold mb-4">All Events</h1>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div v-for="event in events" :key="event.id" class="border rounded-lg p-4 shadow hover:shadow-lg transition">
+          <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
+          <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">{{ event.location }}</p>
+          <div class="text-xs sm:text-sm xl:text-md text-gray-500 mt-1">
+            {{ formatEventTime(event) }}
+          </div>
+          <p class="text-xs sm:text-sm xl:text-md text-gray-600 mt-2">{{ event.description }}</p>
+        </div>
+      </div>
+    </div>
+  </component>
 </template>
 <script setup>
-  defineProps({
-    events: Array
-  })
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import GuestLayout from '@/Layouts/GuestLayout.vue'
+import { usePage } from '@inertiajs/vue3'
+
+const layout = usePage().props.auth?.user ? AuthenticatedLayout : GuestLayout
+
+defineProps({
+  events: Array
+})
+
+const formatEventTime = (event) => {
+  const start = new Date(event.start_time)
+  const end = new Date(event.end_time)
+
+  const sameDay = start.toDateString() === end.toDateString()
+
+  if (sameDay) {
+    return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} to ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+  } else {
+    return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} to ${end.toLocaleDateString()} ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+  }
+}
 </script>
