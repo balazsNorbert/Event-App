@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('/events', EventController::class)->except(['index']);
     Route::get('/my-events', [EventController::class, 'myEvents'])->name('events.my-events');
+    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
 });
 
 require __DIR__.'/auth.php';
