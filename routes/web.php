@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RsvpController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,6 +29,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('/events', EventController::class)->except(['index']);
     Route::get('/my-events', [EventController::class, 'myEvents'])->name('events.my-events');
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+    Route::post('/events/{event}/rsvp', [RsvpController::class, 'store'])->name('events.rsvp');
+    Route::delete('/events/{event}/rsvp', [RsvpController::class, 'destroy'])->name('events.rsvp.cancel');
 });
 
 require __DIR__.'/auth.php';

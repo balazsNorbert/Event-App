@@ -48,6 +48,18 @@ class User extends Authenticatable
 
     public function events()
     {
-      return $this->hasMany(Event::class);
+       return $this->hasMany(Event::class);
+    }
+
+    public function rsvps()
+    {
+        return $this->hasMany(Rsvp::class);
+    }
+
+    public function attendingEvents()
+    {
+        return $this->belongsToMany(Event::class, 'rsvps')
+                    ->withPivot('status')
+                    ->withTimestamps();
     }
 }
