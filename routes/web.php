@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events/{event}/rsvp', [RsvpController::class, 'store'])->name('events.rsvp');
     Route::delete('/events/{event}/rsvp', [RsvpController::class, 'destroy'])->name('events.rsvp.cancel');
+    Route::get('/my-interests', [EventController::class, 'myInterests'])->name('events.my-interests');
 });
 
 require __DIR__.'/auth.php';

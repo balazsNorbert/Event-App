@@ -23,13 +23,27 @@ class EventController extends Controller
         ]);
     }
 
-     public function myEvents()
+    public function myEvents()
     {
         $userId = Auth::id();
         $events = Event::where('user_id', $userId)->get();
 
         return Inertia::render('Events/MyEvents', [
             'events' => $events,
+        ]);
+    }
+
+    public function myInterests()
+    {
+        $userId = Auth::id();
+
+        $events = Event::whereHas('rsvps', function($query) use ($userId) {
+            $query->where('user_id', $userId)
+                  ->whereIn('status', ['going', 'interested']);
+        })->get();
+
+        return Inertia::render('Events/MyInterests', [
+            'events' => $events
         ]);
     }
 
