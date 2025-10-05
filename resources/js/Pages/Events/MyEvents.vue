@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { Inertia } from '@inertiajs/inertia'
+import { router } from '@inertiajs/core'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import GuestLayout from '@/Layouts/GuestLayout.vue'
 import { usePage } from '@inertiajs/vue3'
@@ -58,11 +58,11 @@ const formatEventTime = (event) => {
   }
 }
 
-const editEvent = (id) => Inertia.get(`/events/${id}/edit`)
+const editEvent = (id) => router.get(`/events/${id}/edit`)
 const deleteEvent = (id) => {
   if (confirm("Are you sure you want to delete this event?")) {
-    Inertia.delete(`/events/${id}`)
+    router.delete(`/events/${id}`)
   }
 }
-const createEvent = () => Inertia.get('/events/create')
+const createEvent = () => router.get('/events/create')
 </script>
