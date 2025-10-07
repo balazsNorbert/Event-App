@@ -1,8 +1,38 @@
 <template>
   <component :is="layout">
-    <div class="p-6">
+    <div class="flex flex-col gap-6 p-6">
       <h1 class="text-xl sm:text-2xl xl:text-3xl font-bold mb-4">My Events</h1>
-      <div v-if="events.length === 0" class="text-gray-500">No events yet.</div>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div class="relative w-full sm:w-1/2">
+          <Search class="absolute top-2 left-2 w-5 h-5 text-gray-400" />
+          <input
+          v-model="myEventFilters.search"
+          type="text"
+            placeholder="Search events..."
+            class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
+            @input="applyMyEventFilters"
+            />
+          </div>
+          <label
+          class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl px-4 py-2 cursor-pointer shadow-sm transition-all"
+          >
+          <input
+          type="checkbox"
+          v-model="myEventFilters.future"
+          class="rounded text-indigo-600 focus:ring-indigo-500"
+          @change="applyMyEventFilters"
+          />
+          <span class="text-sm font-medium text-gray-700">Future events only</span>
+        </label>
+      </div>
+      <div v-if="events.length === 0" class="text-gray-700">
+        <div v-if="filters.search || filters.future">
+          No events match your search criteria.
+        </div>
+        <div v-else>
+          No events yet.
+        </div>
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <button
           @click="createEvent"
@@ -38,11 +68,20 @@ import { router } from '@inertiajs/core'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import GuestLayout from '@/Layouts/GuestLayout.vue'
 import { usePage } from '@inertiajs/vue3'
-
-const layout = usePage().props.auth?.user ? AuthenticatedLayout : GuestLayout
+import { ref } from 'vue'
+import { Search } from 'lucide-vue-next'
 
 defineProps({
-  events: Array
+  events: Array,
+  filters: Object,
+})
+
+const page = usePage()
+const layout = usePage().props.auth?.user ? AuthenticatedLayout : GuestLayout
+
+const myEventFilters = ref({
+  search: page.props.filters?.search || '',
+  future: page.props.filters?.future || false,
 })
 
 const formatEventTime = (event) => {
@@ -58,6 +97,10 @@ const formatEventTime = (event) => {
   }
 }
 
+const applyMyEventFilters = () => {
+  router.get('/my-events', myEventFilters.value, { preserveState: true, replace: true })
+}
+
 const editEvent = (id) => router.get(`/events/${id}/edit`)
 const deleteEvent = (id) => {
   if (confirm("Are you sure you want to delete this event?")) {
@@ -65,4 +108,6 @@ const deleteEvent = (id) => {
   }
 }
 const createEvent = () => router.get('/events/create')
+
+
 </script>
