@@ -7,43 +7,91 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
+
 class EventController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::all();
+        $query = Event::query();
+
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->boolean('future')) {
+            $query->where('start_time', '>=', now());
+        }
+
         $userId = Auth::id();
+        $events = $query->get();
 
         return Inertia::render('Events/Index', [
             'events' => $events,
             'userId' => $userId,
+            'filters' => $request->only(['search', 'future']),
         ]);
     }
 
-    public function myEvents()
+    public function myEvents(Request $request)
     {
         $userId = Auth::id();
-        $events = Event::where('user_id', $userId)->get();
+        $query = Event::where('user_id', $userId);
+
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->boolean('future')) {
+            $query->where('start_time', '>=', now());
+        }
+
+        $events = $query->get();
 
         return Inertia::render('Events/MyEvents', [
             'events' => $events,
+            'userId' => $userId,
+            'filters' => $request->only(['search', 'future']),
         ]);
     }
 
-    public function myInterests()
+    public function myInterests(Request $request)
     {
         $userId = Auth::id();
 
-        $events = Event::whereHas('rsvps', function($query) use ($userId) {
+        $query = Event::whereHas('rsvps', function($query) use ($userId) {
             $query->where('user_id', $userId)
                   ->whereIn('status', ['going', 'interested']);
-        })->get();
+        });
+
+        if ($search = $request->input('search')) {
+        $query->where(function($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%")
+              ->orWhere('location', 'like', "%{$search}%");
+        });
+        }
+
+        if ($request->boolean('future')) {
+            $query->where('start_time', '>=', now());
+        }
+
+        $events = $query->get();
 
         return Inertia::render('Events/MyInterests', [
-            'events' => $events
+          'events' => $events,
+          'userId' => $userId,
+          'filters' => $request->only(['search', 'future']),
         ]);
     }
 
