@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-events', [EventController::class, 'myEvents'])->name('events.my-events');
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events/{event}/rsvp', [RsvpController::class, 'store'])->name('events.rsvp');
+    Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
     Route::delete('/events/{event}/rsvp', [RsvpController::class, 'destroy'])->name('events.rsvp.cancel');
     Route::get('/my-interests', [EventController::class, 'myInterests'])->name('events.my-interests');
 });

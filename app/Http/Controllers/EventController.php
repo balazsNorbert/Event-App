@@ -100,7 +100,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Events/Create');
     }
 
     /**
@@ -108,7 +108,26 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $userId = Auth::id();
+        $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'location' => 'required|string',
+            'start_time' => 'required|date|after_or_equal:now',
+            'end_time' => 'required|date|after_or_equal:start_time',
+        ]);
+
+        Event::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'location' => $request->location,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'user_id' => $userId,
+        ]);
+
+        return redirect()->route('events.index')
+                         ->with('success', 'Event created successfully!');
     }
 
     /**
@@ -122,24 +141,64 @@ class EventController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Event $event)
     {
-        //
+        $userId = Auth::id();
+
+        if ($event->user_id !== $userId) {
+          abort(403);
+        }
+
+        return Inertia::render('Events/Edit', [
+            'event' => $event,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Event $event)
     {
-        //
+        $userId = Auth::id();
+
+        if ($event->user_id !== $userId) {
+            abort(403);
+        }
+
+        $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'location' => 'required|string',
+            'start_time' => 'required|date|after_or_equal:now',
+            'end_time' => 'required|date|after_or_equal:start_time',
+        ]);
+
+        $event->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'location' => $request->location,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+        ]);
+
+        return redirect()->route('events.index')
+                        ->with('success', 'Event updated successfully!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event)
     {
-        //
+        $userId = Auth::id();
+
+        if ($event->user_id !== $userId) {
+        abort(403);
+        }
+
+        $event->delete();
+
+        return redirect()->route('events.index')
+                        ->with('success', 'Event deleted successfully!');
     }
 }
