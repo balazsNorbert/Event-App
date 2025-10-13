@@ -44,6 +44,7 @@
         </button>
         <div v-for="event in events" :key="event.id" class="flex flex-col gap-2 border rounded-lg p-4 pb-10 shadow hover:shadow-lg transition relative">
           <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
+          <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
           <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">{{ event.location }}</p>
           <div class="text-xs sm:text-sm xl:text-md text-gray-500">
             {{ formatEventTime(event) }}

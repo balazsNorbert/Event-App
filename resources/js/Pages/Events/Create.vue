@@ -24,6 +24,15 @@
             <label class="font-semibold text-gray-700">Description</label>
             <textarea v-model="form.description" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
           </div>
+          <div>
+            <label class="font-semibold text-gray-700">Image</label>
+            <input
+              type="file"
+              name="image"
+              @change="handleFileUpload"
+              class="border rounded p-2"
+            />
+          </div>
           <button type="submit" class="w-full px-4 py-2 text-white font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
             Create Event
           </button>
@@ -48,7 +57,12 @@ const form = reactive({
   location: '',
   start_time: '',
   end_time: '',
+  image: '',
 })
+
+const handleFileUpload = (e) => {
+  form.image = e.target.files[0]
+}
 
 const submit = () => {
   router.post('/events', form)

@@ -24,6 +24,19 @@
             <label class="font-semibold text-gray-700">Description</label>
             <textarea v-model="form.description" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
           </div>
+          <div>
+            <label class="font-semibold text-gray-700">New image</label>
+            <input
+              type="file"
+              name="image"
+              @change="handleFileUpload"
+              class="border rounded p-2"
+            />
+          </div>
+          <div v-if="event.image">
+            <label class="font-semibold text-gray-700">Current image</label>
+            <img :src="`/storage/${event.image}`" class="w-full rounded" />
+          </div>
           <button type="submit" class="w-full px-4 py-2 text-white font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
             Update Event
           </button>
@@ -49,9 +62,26 @@ const form = reactive({
   location: event.location,
   start_time: event.start_time,
   end_time: event.end_time,
+  image: null,
 })
 
+const handleFileUpload = (e) => {
+  form.image = e.target.files[0]
+}
+
 const submit = () => {
-  router.put(`/events/${event.id}`, form)
+  const data = new FormData()
+  data.append('title', form.title)
+  data.append('description', form.description)
+  data.append('location', form.location)
+  data.append('start_time', form.start_time)
+  data.append('end_time', form.end_time)
+
+  if (form.image) data.append('image', form.image)
+
+  router.put(`/events/${event.id}`, data, {
+    forceFormData: true,
+    preserveState: true
+  })
 }
 </script>

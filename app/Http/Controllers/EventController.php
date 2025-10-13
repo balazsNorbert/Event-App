@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -115,7 +116,10 @@ class EventController extends Controller
             'location' => 'required|string',
             'start_time' => 'required|date|after_or_equal:now',
             'end_time' => 'required|date|after_or_equal:start_time',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png',
         ]);
+
+        $path = $request->hasFile('image') ? $request->file('image')->store('event-images', 'public') : null;
 
         Event::create([
             'title' => $request->title,
@@ -124,6 +128,7 @@ class EventController extends Controller
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'user_id' => $userId,
+            'image' => $path,
         ]);
 
         return redirect()->route('events.index')
@@ -171,15 +176,19 @@ class EventController extends Controller
             'location' => 'required|string',
             'start_time' => 'required|date|after_or_equal:now',
             'end_time' => 'required|date|after_or_equal:start_time',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png',
         ]);
 
-        $event->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'location' => $request->location,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-        ]);
+        $data = $request->only(['title','description','location','start_time','end_time']);
+
+        if ($request->hasFile('image')) {
+            if ($event->image && Storage::disk('public')->exists($event->image)) {
+                Storage::disk('public')->delete($event->image);
+            }
+            $data['image'] = $request->file('image')->store('event-images', 'public');
+        }
+
+        $event->update($data);
 
         return redirect()->route('events.index')
                         ->with('success', 'Event updated successfully!');
