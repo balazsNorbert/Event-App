@@ -7,22 +7,37 @@
           <div>
             <label class="font-semibold text-gray-700">Title</label>
             <input v-model="form.title" type="text" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div v-if="errors.title" class="text-red-500 text-sm">{{ errors.title }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">Location</label>
             <input v-model="form.location" type="text" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div v-if="errors.location" class="text-red-500 text-sm">{{ errors.location }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">Start Time</label>
             <input v-model="form.start_time" type="datetime-local" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div v-if="errors.start_time" class="text-red-500 text-sm">{{ errors.start_time }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">End Time</label>
             <input v-model="form.end_time" type="datetime-local" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div v-if="errors.end_time" class="text-red-500 text-sm">{{ errors.end_time }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">Description</label>
             <textarea v-model="form.description" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+            <div v-if="errors.description" class="text-red-500 text-sm">{{ errors.description }}</div>
+          </div>
+          <div>
+            <label class="font-semibold text-gray-700">Image</label>
+            <input
+              type="file"
+              name="image"
+              @change="handleFileUpload"
+              class="border rounded p-2"
+            />
+            <div v-if="errors.image" class="text-red-500 text-sm">{{ errors.image }}</div>
           </div>
           <button type="submit" class="w-full px-4 py-2 text-white font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
             Create Event
@@ -36,11 +51,12 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import GuestLayout from '@/Layouts/GuestLayout.vue'
-import { usePage } from '@inertiajs/vue3'
-import { router } from '@inertiajs/vue3'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
 
-const layout = usePage().props.auth?.user ? AuthenticatedLayout : GuestLayout
+const page = usePage()
+const layout = page.props.auth?.user ? AuthenticatedLayout : GuestLayout
+const errors = ref(page.props.errors || {})
 
 const form = reactive({
   title: '',
@@ -48,9 +64,18 @@ const form = reactive({
   location: '',
   start_time: '',
   end_time: '',
+  image: '',
 })
 
+const handleFileUpload = (e) => {
+  form.image = e.target.files[0]
+}
+
 const submit = () => {
-  router.post('/events', form)
+  router.post('/events', form, {
+    onError: (err) => {
+      errors.value = err
+    }
+  })
 }
 </script>
