@@ -7,22 +7,27 @@
           <div>
             <label class="font-semibold text-gray-700">Title</label>
             <input v-model="form.title" type="text" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div v-if="errors.title" class="text-red-500 text-sm">{{ errors.title }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">Location</label>
             <input v-model="form.location" type="text" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div v-if="errors.location" class="text-red-500 text-sm">{{ errors.location }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">Start Time</label>
             <input v-model="form.start_time" type="datetime-local" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div v-if="errors.start_time" class="text-red-500 text-sm">{{ errors.start_time }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">End Time</label>
             <input v-model="form.end_time" type="datetime-local" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div v-if="errors.end_time" class="text-red-500 text-sm">{{ errors.end_time }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">Description</label>
             <textarea v-model="form.description" class="w-full border border-gray-300 focus:border-none p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+            <div v-if="errors.description" class="text-red-500 text-sm">{{ errors.description }}</div>
           </div>
           <div>
             <label class="font-semibold text-gray-700">New image</label>
@@ -32,6 +37,7 @@
               @change="handleFileUpload"
               class="border rounded p-2"
             />
+            <div v-if="errors.image" class="text-red-500 text-sm">{{ errors.image }}</div>
           </div>
           <div v-if="event.image">
             <label class="font-semibold text-gray-700">Current image</label>
@@ -49,12 +55,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import GuestLayout from '@/Layouts/GuestLayout.vue'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 
-const props = usePage().props
-const event = props.event
-const layout = usePage().props.auth?.user ? AuthenticatedLayout : GuestLayout
+const page = usePage()
+const layout = page.props.auth?.user ? AuthenticatedLayout : GuestLayout
+const event = page.props.event
+const errors = ref(page.props.errors || {})
 
 const form = reactive({
   title: event.title,
@@ -76,12 +83,16 @@ const submit = () => {
   data.append('location', form.location)
   data.append('start_time', form.start_time)
   data.append('end_time', form.end_time)
+  data.append('_method', 'PUT')
 
   if (form.image) data.append('image', form.image)
 
-  router.put(`/events/${event.id}`, data, {
+  router.post(`/events/${event.id}`, data, {
     forceFormData: true,
-    preserveState: true
+    preserveState: true,
+    onError: (err) => {
+      errors.value = err
+    }
   })
 }
 </script>
