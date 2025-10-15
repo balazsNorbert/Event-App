@@ -22,6 +22,10 @@ Route::get('/dashboard', function () {
 
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 
+Route::get('/events/map', function () {
+    return Inertia::render('Events/EventMap');
+})->name('events.map');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

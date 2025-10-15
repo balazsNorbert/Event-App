@@ -45,7 +45,18 @@
         <div v-for="event in events" :key="event.id" class="flex flex-col gap-2 border rounded-lg p-4 pb-10 shadow hover:shadow-lg transition relative">
           <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
           <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
-          <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">{{ event.location }}</p>
+          <div class="flex flex-wrap justify-between md:items-center">
+            <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
+              {{ event.location }}
+            </p>
+            <a
+              :href="route('events.map', { location: event.location , title: event.title })"
+              class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors ml-2"
+            >
+              <MapPin class="w-5 h-5" />
+              <span class="underline-offset-2 hover:underline">View on Map</span>
+            </a>
+          </div>
           <div class="text-xs sm:text-sm xl:text-md text-gray-500">
             {{ formatEventTime(event) }}
           </div>
@@ -70,7 +81,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import GuestLayout from '@/Layouts/GuestLayout.vue'
 import { usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
-import { Search } from 'lucide-vue-next'
+import { Search, MapPin } from 'lucide-vue-next'
 
 defineProps({
   events: Array,
