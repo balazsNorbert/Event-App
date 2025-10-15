@@ -1,6 +1,6 @@
 <template>
   <component :is="layout">
-    <div class="p-6">
+    <div class="flex flex-col gap-6 p-6">
       <h1 class="text-xl sm:text-2xl xl:text-3xl font-bold mb-4">My Interests</h1>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div class="relative w-full sm:w-1/2">
@@ -37,7 +37,18 @@
         <div v-for="event in events" :key="event.id" class="border rounded-lg p-4 shadow hover:shadow-lg transition relative">
           <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
           <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
-          <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">{{ event.location }}</p>
+          <div class="flex flex-wrap justify-between md:items-center">
+            <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
+              {{ event.location }}
+            </p>
+            <a
+              :href="route('events.map', { location: event.location , title: event.title })"
+              class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors ml-2"
+            >
+              <MapPin class="w-5 h-5" />
+              <span class="underline-offset-2 hover:underline">View on Map</span>
+            </a>
+          </div>
           <div class="text-xs sm:text-sm xl:text-md text-gray-500 mt-1">{{ formatEventTime(event) }}</div>
           <p class="text-xs sm:text-sm xl:text-md text-gray-600 mt-2">{{ event.description }}</p>
         </div>
@@ -52,7 +63,7 @@ import GuestLayout from '@/Layouts/GuestLayout.vue'
 import { router } from '@inertiajs/core'
 import { usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
-import { Search } from 'lucide-vue-next'
+import { Search, MapPin } from 'lucide-vue-next'
 
 defineProps({
   events: Array,
