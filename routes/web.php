@@ -26,17 +26,21 @@ Route::get('/events/map', function () {
     return Inertia::render('Events/EventMap');
 })->name('events.map');
 
+Route::get('/events/calendar', [EventController::class, 'eventsCalendar'])->name('events.eventsCalendar');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('/events', EventController::class)->except(['index']);
-    Route::get('/my-events', [EventController::class, 'myEvents'])->name('events.my-events');
+    Route::get('/my-events', [EventController::class, 'myEvents'])->name('events.myEvents');
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events/{event}/rsvp', [RsvpController::class, 'store'])->name('events.rsvp');
     Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
     Route::delete('/events/{event}/rsvp', [RsvpController::class, 'destroy'])->name('events.rsvp.cancel');
-    Route::get('/my-interests', [EventController::class, 'myInterests'])->name('events.my-interests');
+    Route::get('/my-interests', [EventController::class, 'myInterests'])->name('events.myInterests');
+    Route::get('/my-events/calendar', [EventController::class, 'myEventsCalendar'])->name('events.myEventsCalendar');
+    Route::get('/my-interests/calendar', [EventController::class, 'myInterestsCalendar'])->name('events.myInterestsCalendar');
 });
 
 require __DIR__.'/auth.php';
