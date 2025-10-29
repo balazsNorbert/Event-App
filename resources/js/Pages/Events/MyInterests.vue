@@ -24,6 +24,15 @@
           />
           <span class="text-sm font-medium text-gray-700">Future events only</span>
         </label>
+        <div class="text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-xl shadow transition">
+          <a
+            :href="route('events.myInterestsCalendar')"
+            class="flex items-center gap-2"
+          >
+            <Calendar class="w-5 h-5" />
+            View Calendar
+          </a>
+        </div>
       </div>
       <div v-if="events.length === 0" class="text-gray-700">
         <div v-if="filters.search || filters.future">
@@ -59,18 +68,17 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import GuestLayout from '@/Layouts/GuestLayout.vue'
 import { router } from '@inertiajs/core'
 import { usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
-import { Search, MapPin } from 'lucide-vue-next'
+import { Search, MapPin, Calendar } from 'lucide-vue-next'
 
 defineProps({
   events: Array,
   filters: Object
 })
 const page = usePage();
-const layout = usePage().props.auth?.user ? AuthenticatedLayout : GuestLayout
+const layout = AuthenticatedLayout
 
 const myInterestFilters = ref({
   search: page.props.filters?.search || '',

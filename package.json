@@ -21,6 +21,9 @@
         "vue": "^3.4.0"
     },
     "dependencies": {
+        "@fullcalendar/daygrid": "^6.1.19",
+        "@fullcalendar/interaction": "^6.1.19",
+        "@fullcalendar/vue3": "^6.1.19",
         "@inertiajs/core": "^2.2.6",
         "leaflet": "^1.9.4",
         "lucide-vue-next": "^0.545.0"
