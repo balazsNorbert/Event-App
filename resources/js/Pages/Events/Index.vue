@@ -43,7 +43,7 @@
         </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div v-for="event in events" :key="event.id" class="flex flex-col gap-2 border rounded-lg p-4 pb-12 shadow hover:shadow-lg transition w-full relative">
+        <div v-for="event in events" :key="event.id" class="flex flex-col items-center gap-2 border rounded-lg p-4 pb-12 shadow hover:shadow-lg transition w-full relative">
           <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
           <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
           <div class="flex flex-wrap justify-between md:items-center">
@@ -63,9 +63,9 @@
           </div>
           <p class="text-xs sm:text-sm xl:text-md text-gray-600">{{ event.description }}</p>
           <div class="absolute bottom-2 flex gap-2 text-sm">
-            <button @click="rsvp(event.id, 'going')" class="px-2 py-1 bg-green-500 text-white rounded">Going</button>
-            <button @click="rsvp(event.id, 'interested')" class="px-2 py-1 bg-yellow-500 text-white rounded">Interested</button>
-            <button @click="rsvp(event.id, 'not_going')" class="px-2 py-1 bg-red-500 text-white rounded">Not Going</button>
+            <button @click="rsvp(event.id, 'going')" :class="[event.user_status === 'going' ? 'bg-green-500' : 'bg-green-500/50 hover:bg-green-500','px-2 py-1  text-white rounded']">Going</button>
+            <button @click="rsvp(event.id, 'interested')" :class="[event.user_status === 'interested' ? 'bg-yellow-500' : 'bg-yellow-500/50 hover:bg-yellow-500','px-2 py-1 text-white rounded']">Interested</button>
+            <button @click="rsvp(event.id, 'not_going')" :class="[event.user_status === 'not_going' ? 'bg-red-500' : 'bg-red-500/50 hover:bg-red-500','px-2 py-1 text-white rounded']">Not Going</button>
           </div>
         </div>
       </div>
@@ -108,7 +108,12 @@ const formatEventTime = (event) => {
 }
 
 const rsvp = (eventId, status) => {
-  router.post(`/events/${eventId}/rsvp`, { status })
+  router.post(`/events/${eventId}/rsvp`, { status }, {
+    onSuccess: () => {
+      const event = events.find(e => e.id === eventId)
+      if (event) event.user_status = status
+    }
+  })
 }
 
 const applyEventFilters = () => {

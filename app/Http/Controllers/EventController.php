@@ -31,7 +31,15 @@ class EventController extends Controller
         }
 
         $userId = Auth::id();
-        $events = $query->get();
+        $events = Event::with(['rsvps' => function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        }])->get();
+
+        $events->transform(function ($event) {
+            $event->user_status = optional($event->rsvps->first())->status;
+            unset($event->rsvps);
+            return $event;
+        });
 
         return Inertia::render('Events/Index', [
             'events' => $events,
