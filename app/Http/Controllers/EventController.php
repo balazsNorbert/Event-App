@@ -37,6 +37,8 @@ class EventController extends Controller
 
         $events->transform(function ($event) {
             $event->user_status = optional($event->rsvps->first())->status;
+            $event->going_count = $event->rsvps->where('status', 'going')->count();
+            $event->interested_count = $event->rsvps->where('status', 'interested')->count();
             unset($event->rsvps);
             return $event;
         });
@@ -65,7 +67,17 @@ class EventController extends Controller
             $query->where('start_time', '>=', now());
         }
 
-        $events = $query->get();
+        $events = Event::with(['rsvps' => function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        }])->get();
+
+        $events->transform(function ($event) {
+            $event->going_count = $event->rsvps->where('status', 'going')->count();
+            $event->interested_count = $event->rsvps->where('status', 'interested')->count();
+            unset($event->rsvps);
+            return $event;
+        });
+
 
         return Inertia::render('Events/MyEvents', [
             'events' => $events,
@@ -101,6 +113,8 @@ class EventController extends Controller
 
         $events->transform(function ($event) {
             $event->user_status = optional($event->rsvps->first())->status;
+            $event->going_count = $event->rsvps->where('status', 'going')->count();
+            $event->interested_count = $event->rsvps->where('status', 'interested')->count();
             unset($event->rsvps);
             return $event;
         });

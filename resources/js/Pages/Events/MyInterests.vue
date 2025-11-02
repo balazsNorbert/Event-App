@@ -45,8 +45,13 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div v-for="event in events" :key="event.id" class="flex flex-col justify-between items-center gap-2 border rounded-lg p-4 shadow hover:shadow-lg transition w-full">
           <div class="flex flex-col gap-2">
-            <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
             <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
+            <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
+            <div v-if="event.going_count > 0 || event.interested_count > 0" class="flex gap-1 text-sm sm:text-md xl:text-lg text-gray-500 font-semibold">
+              <span v-if="event.interested_count > 0">{{ event.interested_count }} Interested</span>
+              <span v-if="event.going_count > 0 && event.interested_count > 0">|</span>
+              <span v-if="event.going_count > 0">{{ event.going_count }} Going</span>
+            </div>
             <div class="flex flex-wrap justify-between md:items-center">
               <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
                 {{ event.location }}
