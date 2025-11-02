@@ -54,6 +54,11 @@
         <div v-for="event in events" :key="event.id" class="flex flex-col gap-2 border rounded-lg p-4 pb-10 shadow hover:shadow-lg transition relative">
           <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
           <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
+          <div v-if="event.going_count > 0 || event.interested_count > 0" class="flex gap-1 text-sm sm:text-md xl:text-lg text-gray-500 font-semibold">
+            <span v-if="event.interested_count > 0">{{ event.interested_count }} Interested</span>
+            <span v-if="event.going_count > 0 && event.interested_count > 0">|</span>
+            <span v-if="event.going_count > 0">{{ event.going_count }} Going</span>
+          </div>
           <div class="flex flex-wrap justify-between md:items-center">
             <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
               {{ event.location }}
