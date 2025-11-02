@@ -43,26 +43,28 @@
         </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div v-for="event in events" :key="event.id" class="flex flex-col items-center gap-2 border rounded-lg p-4 pb-12 shadow hover:shadow-lg transition w-full relative">
-          <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
-          <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
-          <div class="flex flex-wrap justify-between md:items-center">
-            <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
-              {{ event.location }}
-            </p>
-            <a
-              :href="route('events.map', { location: event.location , title: event.title })"
-              class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors ml-2"
-            >
-              <MapPin class="w-5 h-5"/>
-              <span class="underline-offset-2 hover:underline">View on Map</span>
-            </a>
+        <div v-for="event in events" :key="event.id" class="flex flex-col justify-between items-center gap-2 border rounded-lg p-4 shadow hover:shadow-lg transition w-full">
+          <div class="flex flex-col gap-2">
+            <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
+            <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
+            <div class="flex flex-wrap justify-between md:items-center">
+              <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
+                {{ event.location }}
+              </p>
+              <a
+                :href="route('events.map', { location: event.location , title: event.title })"
+                class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors ml-2"
+              >
+                <MapPin class="w-5 h-5"/>
+                <span class="underline-offset-2 hover:underline">View on Map</span>
+              </a>
+            </div>
+            <div class="text-xs sm:text-sm xl:text-md text-gray-500">
+              {{ formatEventTime(event) }}
+            </div>
+            <p class="text-xs sm:text-sm xl:text-md text-gray-600">{{ event.description }}</p>
           </div>
-          <div class="text-xs sm:text-sm xl:text-md text-gray-500">
-            {{ formatEventTime(event) }}
-          </div>
-          <p class="text-xs sm:text-sm xl:text-md text-gray-600">{{ event.description }}</p>
-          <div class="absolute bottom-2 flex gap-2 text-sm">
+          <div class="flex gap-2 text-sm">
             <button @click="rsvp(event.id, 'going')" :class="[event.user_status === 'going' ? 'bg-green-500' : 'bg-green-500/50 hover:bg-green-500','px-2 py-1  text-white rounded']">Going</button>
             <button @click="rsvp(event.id, 'interested')" :class="[event.user_status === 'interested' ? 'bg-yellow-500' : 'bg-yellow-500/50 hover:bg-yellow-500','px-2 py-1 text-white rounded']">Interested</button>
             <button @click="rsvp(event.id, 'not_going')" :class="[event.user_status === 'not_going' ? 'bg-red-500' : 'bg-red-500/50 hover:bg-red-500','px-2 py-1 text-white rounded']">Not Going</button>
@@ -80,7 +82,7 @@ import { router } from '@inertiajs/core'
 import { ref } from 'vue'
 import { Search, MapPin, Calendar } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   events: Array,
   filters: Object,
 })
@@ -107,10 +109,12 @@ const formatEventTime = (event) => {
   }
 }
 
+const events = ref(props.events.map(e => ({ ...e })))
+
 const rsvp = (eventId, status) => {
   router.post(`/events/${eventId}/rsvp`, { status }, {
     onSuccess: () => {
-      const event = events.find(e => e.id === eventId)
+      const event = events.value.find(e => e.id === eventId)
       if (event) event.user_status = status
     }
   })

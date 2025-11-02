@@ -95,7 +95,15 @@ class EventController extends Controller
             $query->where('start_time', '>=', now());
         }
 
-        $events = $query->get();
+        $events = $query->with(['rsvps' => function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        }])->get();
+
+        $events->transform(function ($event) {
+            $event->user_status = optional($event->rsvps->first())->status;
+            unset($event->rsvps);
+            return $event;
+        });
 
         return Inertia::render('Events/MyInterests', [
           'events' => $events,
