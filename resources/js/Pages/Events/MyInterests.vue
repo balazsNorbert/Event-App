@@ -43,23 +43,32 @@
         </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <div v-for="event in events" :key="event.id" class="border rounded-lg p-4 shadow hover:shadow-lg transition relative">
-          <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
-          <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
-          <div class="flex flex-wrap justify-between md:items-center">
-            <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
-              {{ event.location }}
-            </p>
-            <a
-              :href="route('events.map', { location: event.location , title: event.title })"
-              class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors ml-2"
-            >
-              <MapPin class="w-5 h-5" />
-              <span class="underline-offset-2 hover:underline">View on Map</span>
-            </a>
+        <div v-for="event in events" :key="event.id" class="flex flex-col justify-between items-center gap-2 border rounded-lg p-4 shadow hover:shadow-lg transition w-full">
+          <div class="flex flex-col gap-2">
+            <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
+            <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
+            <div class="flex flex-wrap justify-between md:items-center">
+              <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
+                {{ event.location }}
+              </p>
+              <a
+                :href="route('events.map', { location: event.location , title: event.title })"
+                class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors ml-2"
+              >
+                <MapPin class="w-5 h-5" />
+                <span class="underline-offset-2 hover:underline">View on Map</span>
+              </a>
+            </div>
+            <div class="text-xs sm:text-sm xl:text-md text-gray-500">
+              {{ formatEventTime(event) }}
+            </div>
+            <p class="text-xs sm:text-sm xl:text-md text-gray-600">{{ event.description }}</p>
           </div>
-          <div class="text-xs sm:text-sm xl:text-md text-gray-500 mt-1">{{ formatEventTime(event) }}</div>
-          <p class="text-xs sm:text-sm xl:text-md text-gray-600 mt-2">{{ event.description }}</p>
+          <div class="flex gap-2 text-sm">
+            <button @click="rsvp(event.id, 'going')" :class="[event.user_status === 'going' ? 'bg-green-500' : 'bg-green-500/50 hover:bg-green-500','px-2 py-1  text-white rounded']">Going</button>
+            <button @click="rsvp(event.id, 'interested')" :class="[event.user_status === 'interested' ? 'bg-yellow-500' : 'bg-yellow-500/50 hover:bg-yellow-500','px-2 py-1 text-white rounded']">Interested</button>
+            <button @click="rsvp(event.id, 'not_going')" :class="[event.user_status === 'not_going' ? 'bg-red-500' : 'bg-red-500/50 hover:bg-red-500','px-2 py-1 text-white rounded']">Not Going</button>
+          </div>
         </div>
       </div>
     </div>
@@ -73,7 +82,7 @@ import { usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import { Search, MapPin, Calendar } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   events: Array,
   filters: Object
 })
@@ -94,6 +103,23 @@ const formatEventTime = (event) => {
   } else {
     return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleDateString()} ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
   }
+}
+
+const events = ref(props.events.map(e => ({ ...e })))
+
+const rsvp = (eventId, status) => {
+  router.post(`/events/${eventId}/rsvp`, { status }, {
+    onSuccess: () => {
+      const index = events.value.findIndex(e => e.id === eventId)
+      if (index !== -1) {
+        if (status === 'not_going') {
+          events.value.splice(index, 1)
+        } else {
+          events.value[index].user_status = status
+        }
+      }
+    }
+  })
 }
 
 const applyMyInterestFilters = () => {
