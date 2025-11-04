@@ -67,7 +67,7 @@ class EventController extends Controller
             $query->where('start_time', '>=', now());
         }
 
-        $events = Event::with(['rsvps' => function ($query) use ($userId) {
+        $events = $query->with(['rsvps' => function ($query) use ($userId) {
             $query->where('user_id', $userId);
         }])->get();
 
