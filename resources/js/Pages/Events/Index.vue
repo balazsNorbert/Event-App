@@ -1,29 +1,31 @@
 <template>
   <component :is="layout">
-    <div class="flex flex-col gap-6 p-6">
-      <h1 class="text-xl sm:text-2xl xl:text-3xl font-bold mb-4">All Events</h1>
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-        <div class="relative w-full sm:w-1/2">
-          <Search class="absolute top-2 left-2 w-5 h-5 text-gray-400" />
-          <input
-            v-model="eventFilters.search"
-            type="text"
-            placeholder="Search events..."
-            class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
-            @input="applyEventFilters"
-          />
+    <div class="flex flex-col gap-6 py-10 px-4 sm:px-10 lg:px-28">
+      <h1 class="text-2xl xl:text-3xl font-bold mb-4">All Events</h1>
+      <div class="flex flex-wrap justify-between gap-2 mb-6 w-full">
+        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-3/4 lg:w-1/2">
+          <div class="relative w-full">
+            <Search class="absolute top-2 left-2 w-5 h-5 text-gray-400" />
+            <input
+              v-model="eventFilters.search"
+              type="text"
+              placeholder="Search events..."
+              class="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
+              @input="applyEventFilters"
+            />
+          </div>
+          <label
+            class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl px-4 py-2 cursor-pointer shadow-sm transition-all"
+          >
+            <input
+              type="checkbox"
+              v-model="eventFilters.future"
+              class="rounded text-indigo-600 focus:ring-indigo-500"
+              @change="applyEventFilters"
+            />
+            <span class="text-sm font-medium text-gray-700 whitespace-nowrap">Future events only</span>
+          </label>
         </div>
-        <label
-          class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl px-4 py-2 cursor-pointer shadow-sm transition-all"
-        >
-          <input
-            type="checkbox"
-            v-model="eventFilters.future"
-            class="rounded text-indigo-600 focus:ring-indigo-500"
-            @change="applyEventFilters"
-          />
-          <span class="text-sm font-medium text-gray-700">Future events only</span>
-        </label>
         <div class="text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-xl shadow transition">
           <a
             :href="route('events.eventsCalendar')"
