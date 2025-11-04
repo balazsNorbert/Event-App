@@ -42,37 +42,49 @@
           No events yet.
         </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div v-for="event in events" :key="event.id" class="flex flex-col justify-between items-center gap-2 border rounded-lg p-4 shadow hover:shadow-lg transition w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+        <div v-for="event in events" :key="event.id" class="flex flex-col justify-between items-center gap-2 border rounded-2xl p-4 shadow hover:shadow-lg transition w-full">
           <div class="flex flex-col gap-2">
-            <h2 class="text-md sm:text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
-            <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded" />
-            <div v-if="event.going_count > 0 || event.interested_count > 0" class="flex gap-1 text-sm sm:text-md xl:text-lg text-gray-500 font-semibold">
+            <div class="-m-4 mb-2">
+              <img v-if="event.image" :src="`/storage/${event.image}`" class="w-full rounded-t-2xl" />
+            </div>
+            <div v-if="event.going_count > 0 || event.interested_count > 0" class="flex gap-1 text-sm xl:text-base text-gray-500 font-semibold">
               <span v-if="event.interested_count > 0">{{ event.interested_count }} Interested</span>
               <span v-if="event.going_count > 0 && event.interested_count > 0">|</span>
               <span v-if="event.going_count > 0">{{ event.going_count }} Going</span>
             </div>
-            <div class="flex flex-wrap justify-between md:items-center">
-              <p class="text-md sm:text-lg xl:text-xl text-gray-600 italic">
-                {{ event.location }}
-              </p>
+            <h2 class="text-lg xl:text-xl font-semibold">{{ event.title }}</h2>
+            <div>
               <a
                 :href="route('events.map', { location: event.location , title: event.title })"
-                class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors ml-2"
+                class="flex items-center gap-2 text-blue-600 hover:text-blue-700 underline-offset-2 hover:underline transition-colors w-fit group"
               >
-                <MapPin class="w-5 h-5"/>
-                <span class="underline-offset-2 hover:underline">View on Map</span>
+                <span class="text-base xl:text-lg text-blue-600 hover:text-blue-700 italic">
+                  {{ event.location }}
+                </span>
+                <MapPin class="w-5 h-5 group-hover:scale-110 transition-transform duration-300"/>
               </a>
             </div>
-            <div class="text-xs sm:text-sm xl:text-md text-gray-500">
+            <div class="text-sm xl:text-base text-gray-500">
               {{ formatEventTime(event) }}
             </div>
-            <p class="text-xs sm:text-sm xl:text-md text-gray-600">{{ event.description }}</p>
+            <div>
+              <p :class="[ 'transition-all duration-300 text-sm xl:text-base', expandedEvents.has(event.id) ? 'line-clamp-none' : 'line-clamp-3']">
+                {{ event.description }}
+              </p>
+              <button
+                v-if="event.description && event.description.length > 100"
+                @click="toggleDescription(event.id)"
+                class="text-blue-600 hover:text-blue-700 text-xs xl:text-sm font-medium mt-1 focus:outline-none relative z-10"
+              >
+                {{ expandedEvents.has(event.id) ? 'Show less' : 'Show more' }}
+              </button>
+            </div>
           </div>
           <div class="flex gap-2 text-sm">
-            <button @click="rsvp(event.id, 'going')" :class="[event.user_status === 'going' ? 'bg-green-500' : 'bg-green-500/50 hover:bg-green-500','px-2 py-1  text-white rounded']">Going</button>
-            <button @click="rsvp(event.id, 'interested')" :class="[event.user_status === 'interested' ? 'bg-yellow-500' : 'bg-yellow-500/50 hover:bg-yellow-500','px-2 py-1 text-white rounded']">Interested</button>
-            <button @click="rsvp(event.id, 'not_going')" :class="[event.user_status === 'not_going' ? 'bg-red-500' : 'bg-red-500/50 hover:bg-red-500','px-2 py-1 text-white rounded']">Not Going</button>
+            <button @click="rsvp(event.id, 'going')" :class="[event.user_status === 'going' ? 'bg-green-500' : 'bg-green-500/50 hover:bg-green-500','px-3 py-2  text-white rounded']">Going</button>
+            <button @click="rsvp(event.id, 'interested')" :class="[event.user_status === 'interested' ? 'bg-yellow-500' : 'bg-yellow-500/50 hover:bg-yellow-500','px-3 py-2 text-white rounded']">Interested</button>
+            <button @click="rsvp(event.id, 'not_going')" :class="[event.user_status === 'not_going' ? 'bg-red-500' : 'bg-red-500/50 hover:bg-red-500','px-3 py-2 text-white rounded']">Not Going</button>
           </div>
         </div>
       </div>
@@ -123,6 +135,16 @@ const rsvp = (eventId, status) => {
       if (event) event.user_status = status
     }
   })
+}
+
+const expandedEvents = ref(new Set())
+
+const toggleDescription = (eventId) => {
+  if (expandedEvents.value.has(eventId)) {
+    expandedEvents.value.delete(eventId)
+  } else {
+    expandedEvents.value.add(eventId)
+  }
 }
 
 const applyEventFilters = () => {
