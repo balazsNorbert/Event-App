@@ -17,7 +17,7 @@ const showingNavigationDropdown = ref(false);
                 class="border-b border-gray-100 bg-white"
             >
                 <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto px-4 sm:px-10 lg:px-28">
                     <div class="flex h-16 justify-between">
                         <div class="flex">
                             <!-- Logo -->
@@ -31,13 +31,31 @@ const showingNavigationDropdown = ref(false);
 
                             <!-- Navigation Links -->
                             <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:text-center"
                             >
                                 <NavLink
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >
                                     Dashboard
+                                </NavLink>
+                                <NavLink
+                                    :href="route('events.index')"
+                                    :active="route().current('events.index')"
+                                >
+                                    Events
+                                </NavLink>
+                                <NavLink
+                                    :href="route('events.myEvents')"
+                                    :active="route().current('events.myEvents')"
+                                >
+                                    My Events
+                                </NavLink>
+                                <NavLink
+                                    :href="route('events.myInterests')"
+                                    :active="route().current('events.myInterests')"
+                                >
+                                    My Interests
                                 </NavLink>
                             </div>
                         </div>
@@ -145,6 +163,24 @@ const showingNavigationDropdown = ref(false);
                             :active="route().current('dashboard')"
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('events.index')"
+                            :active="route().current('events.index')"
+                        >
+                            Events
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('events.myEvents')"
+                            :active="route().current('events.myEvents')"
+                        >
+                            My Events
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('events.myInterests')"
+                            :active="route().current('events.myInterests')"
+                        >
+                            My Interests
                         </ResponsiveNavLink>
                     </div>
 
